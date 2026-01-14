@@ -2,6 +2,7 @@
 
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import multer from 'multer';
@@ -17,6 +18,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// Enable CORS for all origins
+app.use(cors());
+
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -44,6 +49,7 @@ if (!fs.existsSync(tmpDir)) {
 
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 
 // API endpoint to start analysis

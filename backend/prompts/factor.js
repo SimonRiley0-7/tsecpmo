@@ -16,7 +16,6 @@ Guidelines:
 - Use clear, short names for factors, suitable as section headings in a report.
 - In the description, briefly explain why the factor matters to the overall outcome.
 - In the evidence field, include short excerpts or paraphrases from the document that justify why this factor was chosen.
-- Aim for 5–10 factors for most documents. If the document is very short, fewer factors are acceptable; if very long, you may return more.
 
 Output:
 - You MUST output JSON that matches the provided FactorsSchema exactly.
