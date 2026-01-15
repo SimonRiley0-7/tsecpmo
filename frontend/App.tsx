@@ -144,6 +144,21 @@ const App: React.FC = () => {
       setRoundInfo(null);
     }
 
+    // Handle special step types that don't need audio
+    if (step.stepType === 'factor-complete' && step.factorInfo) {
+      console.log(`[App] Processing factor completion for ${step.factorInfo.factorId}`);
+      setCompletedFactorIds(prev => new Set([...prev, step.factorInfo!.factorId]));
+      // Clean up audio
+      cleanupAudio();
+      setDisplayedText(''); // Clear text or show "Factor concluded"
+
+      // Wait briefly then move on
+      setTimeout(() => {
+        finishCurrentStepRef.current();
+      }, 500);
+      return;
+    }
+
     // Get or generate TTS
     let audioData = audioDataRef.current.get(stepIndex);
     if (!audioData) {
@@ -421,9 +436,23 @@ const App: React.FC = () => {
         },
 
         onFactorComplete: (factorId: string) => {
-          console.log('Factor complete:', factorId);
-          setCompletedFactorIds(prev => new Set([...prev, factorId]));
+          console.log('Factor complete (queued):', factorId);
+          // Queue a completion step instead of updating state immediately
+          turnQueueRef.current.push({
+            speaker: Speaker.SYSTEM,
+            text: '', // No text display needed, or maybe "Factor analysis complete."
+            stepType: 'factor-complete',
+            factorInfo: {
+              factorId,
+              factorName: '', // Not strictly needed for completion logic
+            }
+          });
+
           factorIndexRef.current++;
+
+          if (!isProcessingRef.current) {
+            processNextTurn();
+          }
         },
 
         onSynthesisComplete: (synthesis: Synthesis) => {
@@ -470,23 +499,23 @@ const App: React.FC = () => {
     : null;
 
   return (
-    <div className="flex flex-col h-screen w-full overflow-hidden">
+    <div className="flex flex-col h-screen w-full overflow-hidden font-pixel">
       {/* Navbar */}
-      <header className="h-14 bg-slate-900 text-white flex items-center justify-between px-6 shadow-md z-50">
+      <header className="h-14 bg-[#2d1b0e] text-[#fdf6e3] flex items-center justify-between px-6 shadow-md z-50 border-b-4 border-[#5c3a21]">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-amber-600 rounded-sm border-2 border-amber-300"></div>
-          <h1 className="font-pixel text-xl tracking-widest">PIXEL COURT</h1>
+          <div className="w-3 h-3 bg-[#d97706]"></div>
+          <h1 className="text-xl tracking-widest text-[#fdf6e3] font-bold">AETHER</h1>
         </div>
 
         {appState === AppState.ANALYZING && (
-          <div className="flex items-center gap-2 text-amber-400 font-pixel text-sm">
-            <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+          <div className="flex items-center gap-2 text-[#fcd34d] text-sm">
+            <div className="w-2 h-2 bg-[#fcd34d] rounded-full animate-pulse"></div>
             ANALYZING...
           </div>
         )}
 
         <div className="flex items-center gap-4">
-          <label className="cursor-pointer bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-xs font-sans font-medium transition-colors">
+          <label className="cursor-pointer bg-[#5c3a21] hover:bg-[#784b2b] px-3 py-1.5 rounded text-xs font-sans font-medium transition-colors text-[#fdf6e3] border-2 border-[#2d1b0e]">
             <span>UPLOAD CASE FILE (.MD)</span>
             <input type="file" accept=".md,.txt,.pdf" onChange={handleFileUpload} className="hidden" />
           </label>
@@ -494,11 +523,11 @@ const App: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 flex relative">
+      <div className="flex-1 flex relative bg-[#fdf6e3]">
         {/* Factor Sidebar */}
         {allFactors.length > 0 && appState !== AppState.IDLE && appState !== AppState.FINISHED && (
-          <div className="w-64 bg-slate-900/95 border-r-4 border-slate-700 p-4 overflow-y-auto z-40">
-            <div className="font-pixel text-amber-500 text-sm mb-4 tracking-wider">FACTORS</div>
+          <div className="w-64 bg-[#f4e4bc] border-r-4 border-[#5c3a21] p-4 overflow-y-auto z-40">
+            <div className="text-[#8c501c] text-sm mb-4 tracking-wider font-bold">FACTORS</div>
             <div className="space-y-2">
               {allFactors.map((factor, idx) => {
                 const isActive = currentFactorIndex === idx;
@@ -509,14 +538,14 @@ const App: React.FC = () => {
                     key={factor.id}
                     className={`p-3 border-2 transition-all text-xs
                       ${isActive
-                        ? 'bg-amber-600/20 border-amber-500 text-amber-400'
+                        ? 'bg-[#d97706]/20 border-[#d97706] text-[#78350f]'
                         : isCompleted
-                          ? 'bg-green-900/20 border-green-700 text-green-400'
-                          : 'bg-slate-800/50 border-slate-600 text-slate-400'
+                          ? 'bg-green-100 border-green-600 text-green-800'
+                          : 'bg-[#e6d5a7] border-[#bcaaa4] text-[#5c3a21]'
                       }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="font-pixel text-lg">
+                      <span className="text-lg">
                         {isCompleted ? '✓' : isActive ? '▶' : `${idx + 1}`}
                       </span>
                       <span className="font-sans font-medium truncate">{factor.name}</span>
@@ -529,7 +558,7 @@ const App: React.FC = () => {
         )}
 
         {/* Courtroom */}
-        <div className="flex-1 relative">
+        <div className="flex-1 relative bg-[#e6d5a7]">
           <Courtroom
             currentSpeaker={currentSpeaker}
             displayedText={displayedText}
@@ -542,17 +571,17 @@ const App: React.FC = () => {
 
           {/* Idle Overlay */}
           {appState === AppState.IDLE && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20 backdrop-blur-sm">
-              <div className="text-center p-8 max-w-md bg-slate-900/80 border-4 border-slate-700 rounded-xl shadow-2xl">
-                <div className="font-pixel text-5xl text-amber-500 mb-4 select-none drop-shadow-md">
-                  PIXEL COURT
+            <div className="absolute inset-0 flex items-center justify-center bg-[#2d1b0e]/80 z-20 backdrop-blur-sm">
+              <div className="text-center p-8 max-w-md bg-[#fdf6e3] border-4 border-[#5c3a21] rounded-xl shadow-[8px_8px_0px_0px_rgba(45,27,14,0.5)]">
+                <div className="text-5xl text-[#d97706] mb-4 select-none drop-shadow-md font-bold">
+                  AETHER
                 </div>
-                <p className="text-slate-300 font-pixel text-lg mb-6">
+                <p className="text-[#5c3a21] text-lg mb-6">
                   Upload evidence and select debate rounds.
                 </p>
 
                 <div className="mb-6">
-                  <label className="block text-slate-400 font-pixel text-sm mb-3">
+                  <label className="block text-[#8c501c] text-sm mb-3">
                     DEBATE ROUNDS PER FACTOR
                   </label>
                   <div className="flex justify-center gap-2">
@@ -560,23 +589,23 @@ const App: React.FC = () => {
                       <button
                         key={num}
                         onClick={() => setSelectedRounds(num)}
-                        className={`w-14 h-14 font-pixel text-2xl border-4 transition-all shadow-lg
+                        className={`w-14 h-14 text-2xl border-4 transition-all shadow-lg
                           ${selectedRounds === num
-                            ? 'bg-amber-600 border-amber-400 text-white shadow-amber-500/30'
-                            : 'bg-slate-800 border-slate-600 text-slate-400 hover:border-slate-500 hover:bg-slate-700'
+                            ? 'bg-[#d97706] border-[#92400e] text-white shadow-[#92400e]/30'
+                            : 'bg-[#e6d5a7] border-[#bcaaa4] text-[#5c3a21] hover:border-[#8c501c] hover:bg-[#d4c396]'
                           }`}
                       >
                         {num}
                       </button>
                     ))}
                   </div>
-                  <p className="text-slate-500 text-xs mt-2 font-sans">More rounds = deeper analysis</p>
+                  <p className="text-[#8c501c] text-xs mt-2 font-sans">More rounds = deeper analysis</p>
                 </div>
 
-                <label className="inline-block cursor-pointer bg-amber-600 hover:bg-amber-700 
-                                text-white font-pixel text-xl px-8 py-4 rounded 
-                                border-b-4 border-amber-900 active:border-b-0 
-                                active:translate-y-1 transition-all">
+                <label className="inline-block cursor-pointer bg-[#d97706] hover:bg-[#b45309] 
+                                text-white text-xl px-8 py-4 rounded 
+                                border-b-4 border-[#78350f] active:border-b-0 
+                                active:translate-y-1 transition-all shadow-md">
                   Select Evidence File
                   <input type="file" accept=".md,.txt,.pdf" onChange={handleFileUpload} className="hidden" />
                 </label>
@@ -586,12 +615,12 @@ const App: React.FC = () => {
 
           {/* Finished Overlay */}
           {appState === AppState.FINISHED && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20 backdrop-blur-sm">
-              <div className="text-center p-8 max-w-md bg-slate-900/80 border-4 border-amber-600 rounded-xl shadow-2xl">
-                <div className="font-pixel text-4xl text-amber-500 mb-4 select-none drop-shadow-md">
+            <div className="absolute inset-0 flex items-center justify-center bg-[#2d1b0e]/80 z-20 backdrop-blur-sm">
+              <div className="text-center p-8 max-w-md bg-[#fdf6e3] border-4 border-[#d97706] rounded-xl shadow-[8px_8px_0px_0px_rgba(45,27,14,0.5)]">
+                <div className="text-4xl text-[#d97706] mb-4 select-none drop-shadow-md">
                   COURT ADJOURNED
                 </div>
-                <p className="text-slate-300 font-pixel text-lg mb-6">
+                <p className="text-[#5c3a21] text-lg mb-6">
                   The deliberation has concluded.
                 </p>
 
@@ -599,8 +628,8 @@ const App: React.FC = () => {
                   <button
                     onClick={handleDownload}
                     className="w-full cursor-pointer bg-green-600 hover:bg-green-700 
-                              text-white font-pixel text-lg px-6 py-3 rounded 
-                              border-b-4 border-green-900 active:border-b-0 
+                              text-white text-lg px-6 py-3 rounded 
+                              border-b-4 border-green-800 active:border-b-0 
                               active:translate-y-1 transition-all flex items-center justify-center gap-2"
                   >
                     📥 Download Transcript
@@ -616,9 +645,9 @@ const App: React.FC = () => {
                       setCompletedFactorIds(new Set());
                       setFinalSynthesis(null);
                     }}
-                    className="w-full cursor-pointer bg-amber-600 hover:bg-amber-700 
-                              text-white font-pixel text-lg px-6 py-3 rounded 
-                              border-b-4 border-amber-900 active:border-b-0 
+                    className="w-full cursor-pointer bg-[#d97706] hover:bg-[#b45309] 
+                              text-white text-lg px-6 py-3 rounded 
+                              border-b-4 border-[#78350f] active:border-b-0 
                               active:translate-y-1 transition-all"
                   >
                     New Case
@@ -632,9 +661,9 @@ const App: React.FC = () => {
           {appState === AppState.ERROR && (
             <div className="absolute inset-0 flex items-center justify-center bg-red-900/80 z-20 backdrop-blur-md">
               <div className="text-center text-white p-6 border-4 border-red-500 bg-red-950 rounded-lg shadow-xl max-w-lg">
-                <h2 className="font-pixel text-3xl mb-4 text-red-500">System Error</h2>
+                <h2 className="text-3xl mb-4 text-red-500">System Error</h2>
                 <p className="font-sans mb-6">{errorMsg}</p>
-                <button onClick={() => setAppState(AppState.IDLE)} className="font-pixel text-xl underline hover:text-red-300">
+                <button onClick={() => setAppState(AppState.IDLE)} className="text-xl underline hover:text-red-300">
                   Return to Start
                 </button>
               </div>

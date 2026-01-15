@@ -49,9 +49,7 @@ const LandingNav = () => {
   }, []);
 
   const handleOpenDemo = () => {
-    const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL;
-    if (dashboardUrl) window.location.href = dashboardUrl;
-    else scrollToId("cta");
+    window.location.href = 'http://localhost:5173';
   };
 
   const navItemClass = (id: NonNullable<typeof activeSection>) =>

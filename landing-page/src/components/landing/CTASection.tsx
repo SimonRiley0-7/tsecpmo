@@ -29,10 +29,7 @@ const CTASection = () => {
     setShowFlash(true);
     setTimeout(() => {
       setShowFlash(false);
-      const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL;
-      if (dashboardUrl) {
-        window.location.href = dashboardUrl;
-      }
+      window.location.href = 'http://localhost:5173';
     }, 300);
   };
 

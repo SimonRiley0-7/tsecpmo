@@ -74,7 +74,7 @@ export interface DialogueStep {
     roundNumber?: number;
     totalRounds?: number;
   };
-  stepType?: 'factor-announcement' | 'debate-turn' | 'verdict';
+  stepType?: 'factor-announcement' | 'debate-turn' | 'verdict' | 'factor-complete';
 }
 
 export interface CourtSession {

@@ -22,10 +22,7 @@ const HeroSection = () => {
   }, []);
 
   const handleEnterCourtroom = () => {
-    const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL;
-    if (dashboardUrl) {
-      window.location.href = dashboardUrl;
-    }
+    window.location.href = 'http://localhost:5173';
   };
 
   const scrollToHowItWorks = () => {
