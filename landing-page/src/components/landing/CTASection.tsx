@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-import { cn } from '@/lib/utils';
 import PixelButton from './PixelButton';
 import ScrollReveal from './ScrollReveal';
 import courtroomBg from '@/assets/courtroom-bg.png';
@@ -40,6 +39,7 @@ const CTASection = () => {
   return (
     <section
       ref={sectionRef}
+      id="cta"
       className="relative py-24 px-4 overflow-hidden"
     >
       {/* Background with darker overlay and parallax */}
@@ -78,10 +78,10 @@ const CTASection = () => {
         {/* Text box */}
         <div className="pixel-panel p-8 mb-8">
           <h2 className="text-sm md:text-lg text-foreground mb-4">
-            READY TO BEGIN?
+            READY TO DELIBERATE?
           </h2>
           <p className="text-[10px] text-muted-foreground mb-6 leading-relaxed">
-            Submit your first case and witness the power of AI-driven debate.
+            Upload a report, watch agents debate each factor, then export a unified improvement plan.
           </p>
 
           {/* CTA Button */}
@@ -91,14 +91,9 @@ const CTASection = () => {
             glowing
             onClick={handleClick}
           >
-            Start a Case
+            Open Demo
           </PixelButton>
         </div>
-
-        {/* Footer text */}
-        <p className="text-[8px] text-cream/60">
-          © 2026 AI COURTROOM • ALL RIGHTS RESERVED
-        </p>
       </ScrollReveal>
     </section>
   );

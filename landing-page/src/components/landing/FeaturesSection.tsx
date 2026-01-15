@@ -6,29 +6,29 @@ import { cn } from '@/lib/utils';
 const features = [
   {
     icon: 'brain' as const,
-    title: 'Multi-Agent AI Debate',
-    description: 'Multiple AI agents argue different perspectives with unique reasoning styles.',
+    title: 'Deliberative Multi-Agent Reasoning',
+    description: 'Separate agents extract factors, argue both sides, coordinate stages, and synthesize outcomes.',
   },
   {
     icon: 'scale' as const,
-    title: 'Transparent Reasoning',
-    description: 'Every argument is clearly explained with logical chain of thought.',
+    title: 'Transparent Debate Traces',
+    description: 'Expose claims, rebuttals, evidence packets, and the execution flow that produced the final report.',
   },
   {
     icon: 'gavel' as const,
-    title: 'Judge-Driven Verdict',
-    description: 'An impartial AI judge weighs all evidence and delivers a fair verdict.',
+    title: 'Unified, Actionable Report',
+    description: 'One integrated outcome: what worked, what failed, why it happened, and how to improve.',
   },
   {
     icon: 'scroll' as const,
-    title: 'Structured Argumentation',
-    description: 'Arguments follow formal debate structure for maximum clarity.',
+    title: 'Structured Coordination Flow',
+    description: 'A defined pipeline governs how agents communicate, exchange context, and progress through stages.',
   },
 ];
 
 const FeaturesSection = () => {
   return (
-    <section className="relative py-20 px-4 bg-card">
+    <section id="features" className="relative py-20 px-4 bg-card">
       {/* Decorative pixel pattern top */}
       <div className="absolute top-0 left-0 right-0 h-4 flex">
         {Array.from({ length: 40 }).map((_, i) => (
@@ -65,7 +65,7 @@ const FeaturesSection = () => {
             >
               <PixelPanel
                 variant="default"
-                className="flex items-center gap-6"
+                className="flex items-center gap-6 will-change-transform transition-transform duration-200 ease-out hover:-translate-y-1 hover:scale-[1.03] focus-within:-translate-y-1 focus-within:scale-[1.03] hover:shadow-[inset_-4px_-4px_0_0_hsl(var(--wood-dark)/0.5),inset_4px_4px_0_0_hsl(var(--cream)/0.8),12px_12px_0_0_hsl(var(--wood-dark)/0.25)]"
               >
                 {/* Icon */}
                 <PixelIcon

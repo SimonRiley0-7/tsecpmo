@@ -5,18 +5,18 @@ import PixelIcon from './PixelIcon';
 const steps = [
   {
     icon: 'document' as const,
-    title: 'Submit Evidence',
-    description: 'Upload a Markdown file',
+    title: 'Extract Key Factors',
+    description: 'AETHER decomposes complex reports into decision-driving factors.',
   },
   {
     icon: 'debate' as const,
-    title: 'Hear Both Sides',
-    description: 'Support vs Oppose',
+    title: 'Debate Each Factor',
+    description: 'Support and Oppose agents challenge each claim with rebuttals.',
   },
   {
     icon: 'verdict' as const,
-    title: 'Final Verdict',
-    description: 'AI Synthesizes the Truth',
+    title: 'Synthesize One Report',
+    description: 'A unified, actionable summary with traceable reasoning and next steps.',
   },
 ];
 
@@ -35,49 +35,72 @@ const HowItWorksSection = () => {
         </div>
       </ScrollReveal>
 
-      {/* Steps */}
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-        {steps.map((step, index) => (
-          <ScrollReveal
-            key={index}
-            delay={(index + 1) * 200}
-            className="flex"
-          >
-            <PixelPanel
-              variant="cream"
-              className="flex flex-col items-center text-center w-full"
-            >
-              {/* Step number */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-[8px] border-2 border-wood-dark">
-                STEP {index + 1}
-              </div>
+      {/* Steps timeline */}
+      <div className="max-w-5xl mx-auto">
+        {/* Desktop timeline */}
+        <div className="hidden md:block">
+          <div className="relative pl-12">
+            {/* Vertical line connecting all steps */}
+            <div className="absolute left-4 top-0 bottom-0 w-[2px] bg-border" />
 
-              {/* Icon */}
-              <PixelIcon icon={step.icon} size="lg" className="mb-4 mt-4" />
+            <div className="space-y-8">
+              {steps.map((step, index) => (
+                <ScrollReveal
+                  key={step.title}
+                  delay={(index + 1) * 150}
+                  animation="fade-up"
+                >
+                  <div className="relative">
+                    {/* Dot + number connected to line */}
+                    <div className="absolute -left-12 top-4 flex items-center">
+                      <div className="w-6 h-6 bg-accent border-2 border-wood-dark flex items-center justify-center text-[10px] text-accent-foreground">
+                        {index + 1}
+                      </div>
+                      <div className="w-8 h-[2px] bg-border ml-2" />
+                    </div>
 
-              {/* Title */}
-              <h3 className="text-xs text-foreground mb-3">
-                {step.title}
-              </h3>
-
-              {/* Description */}
-              <p className="text-[10px] text-muted-foreground">
-                {step.description}
-              </p>
-
-              {/* Connector arrow (except last) */}
-              {index < steps.length - 1 && (
-                <div className="hidden md:block absolute -right-4 top-1/2 -translate-y-1/2 z-10">
-                  <div className="flex gap-[2px]">
-                    <div className="w-2 h-2 bg-accent" />
-                    <div className="w-2 h-2 bg-accent" />
-                    <div className="w-3 h-3 bg-accent" style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }} />
+                    <PixelPanel
+                      variant="cream"
+                      className="w-full text-left pr-6"
+                    >
+                      <div className="flex items-start gap-4">
+                        <PixelIcon icon={step.icon} size="md" className="shrink-0" />
+                        <div>
+                          <h3 className="text-xs text-foreground mb-2">
+                            {step.title}
+                          </h3>
+                          <p className="text-[10px] text-muted-foreground leading-relaxed">
+                            {step.description}
+                          </p>
+                        </div>
+                      </div>
+                    </PixelPanel>
                   </div>
+                </ScrollReveal>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile stacked steps */}
+        <div className="md:hidden space-y-6">
+          {steps.map((step, index) => (
+            <ScrollReveal key={step.title} delay={(index + 1) * 150}>
+              <PixelPanel variant="cream" className="text-center">
+                <div className="mb-2 text-[8px] text-muted-foreground tracking-[0.2em]">
+                  STEP {index + 1}
                 </div>
-              )}
-            </PixelPanel>
-          </ScrollReveal>
-        ))}
+                <div className="flex justify-center mb-3">
+                  <PixelIcon icon={step.icon} size="md" />
+                </div>
+                <h3 className="text-xs text-foreground mb-2">{step.title}</h3>
+                <p className="text-[10px] text-muted-foreground leading-relaxed">
+                  {step.description}
+                </p>
+              </PixelPanel>
+            </ScrollReveal>
+          ))}
+        </div>
       </div>
     </section>
   );

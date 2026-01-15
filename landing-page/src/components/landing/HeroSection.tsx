@@ -53,7 +53,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-foreground/30" />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-20">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 pt-28 pb-20">
         {/* Pixel text box overlay */}
         <div
           className={cn(
@@ -64,7 +64,7 @@ const HeroSection = () => {
           {/* Title */}
           <h1 className="text-xl md:text-3xl text-foreground leading-relaxed mb-6">
             <TypewriterText
-              text="AI COURTROOM"
+              text="AETHER"
               speed={80}
               delay={300}
               showCursor={false}
@@ -88,7 +88,7 @@ const HeroSection = () => {
           >
             {showSubtitle && (
               <TypewriterText
-                text="Where arguments are debated and judged by AI"
+                text="Deliberative multi-agent analysis with transparent debates and unified recommendations."
                 speed={40}
                 onComplete={() => setShowButtons(true)}
               />
@@ -108,14 +108,14 @@ const HeroSection = () => {
               glowing
               onClick={handleEnterCourtroom}
             >
-              Enter the Courtroom
+              Open Demo
             </PixelButton>
             <PixelButton
               variant="secondary"
               size="lg"
               onClick={scrollToHowItWorks}
             >
-              View How It Works
+              How It Works
             </PixelButton>
           </div>
         </div>
